@@ -214,8 +214,8 @@ public class GameBoard extends UpdateSystem {
         @Override
         public void finish() {
 
-            //jewelBoard.fallDirection = HexDirection.values()[(jewelBoard.fallDirection.ordinal() + 1) % HexDirection.length];
-            //jewelBoard.rebindFallLines();
+            jewelBoard.fallDirection = HexDirection.values()[(jewelBoard.fallDirection.ordinal() + 1) % HexDirection.length];
+            jewelBoard.rebindFallLines();
 
             List<Combo> allCombos = getCombos();
 
