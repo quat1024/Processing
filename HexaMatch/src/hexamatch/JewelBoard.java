@@ -10,7 +10,7 @@ import java.util.List;
 
 public class JewelBoard extends HexBoard<Jewel> {
 
-    public final HexDirection fallDirection;
+    public HexDirection fallDirection;
     public final HashMap<Integer, List<HexCoord>> fallLines;
 
     public JewelBoard(GameBoard gameBoard) {

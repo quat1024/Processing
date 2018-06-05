@@ -40,6 +40,11 @@ public class Veaser {
         y.setTarget(targetY);
     }
 
+    public void snapToTarget() {
+        x.snapToTarget();
+        y.snapToTarget();
+    }
+
     public void snapToTarget(Vector target) {
         snapToTarget(
                 target.x,

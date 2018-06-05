@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 
 public class Triplet extends Hexagon<Triplet> {
 
-    public final TripletBoard tripletBoard;
+    private final TripletBoard tripletBoard;
     private final HexCoord[] jewelCoordinates;
 
     public Triplet(HexCoord a, HexCoord b, HexCoord c, TripletBoard tripletBoard) {
@@ -66,7 +66,7 @@ public class Triplet extends Hexagon<Triplet> {
 
         return Arrays
                 .stream(jewelCoordinates)
-                .map(tripletBoard.gameBoard.jewelBoard::getHex)
+                .map(tripletBoard.gameBoard.jewelBoard :: getHex)
                 .collect(
                         Collectors.toList()
                 );

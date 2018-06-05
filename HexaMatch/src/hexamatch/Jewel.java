@@ -7,11 +7,11 @@ public class Jewel extends Hexagon<Jewel> {
 
     public JewelType jewelType;
 
-    public Jewel(HexCoord coordinates, JewelBoard jewelBoard) {
+    public Jewel(HexCoord coordinates, JewelBoard jewelBoard, JewelType jewelType) {
 
         super(coordinates, jewelBoard);
 
-        this.jewelType = JewelType.P;
+        this.jewelType = jewelType;
 
     }
 

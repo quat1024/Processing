@@ -1,6 +1,7 @@
 package hexamatch;
 
 import hexamatch.animations.ComboAnimationSequence;
+import hexamatch.animations.FallingJewelSequence;
 import hexamatch.animations.SpinningTripletSequence;
 import hexamatch.engine.IFinalizer;
 import hexamatch.engine.UpdateSystem;
@@ -26,7 +27,7 @@ public class GameBoard extends UpdateSystem {
         this.tripletBoard = new TripletBoard(this);
 
         for (HexCoord startingCoordinates : new RadialIterator(settings.boardSize)) {
-            jewelBoard.addHex(new Jewel(startingCoordinates, jewelBoard));
+            jewelBoard.addHex(new Jewel(startingCoordinates, jewelBoard, getRandomJewelType()));
         }
 
         jewelBoard.rebindFallLines();
@@ -38,13 +39,17 @@ public class GameBoard extends UpdateSystem {
         while (matches.size() > 0) {
 
             for (Triplet triplet : matches) {
-                for (Jewel jewel : triplet.getJewels()) {
 
-                    int currentIndex = jewel.jewelType.ordinal();
-                    int randomOffset = (int) Math.ceil(random.nextDouble() * (jewelTypes.length - 1));
-                    jewel.jewelType = jewelTypes[(currentIndex + randomOffset) % jewelTypes.length];
+                List<Jewel> jewels = triplet.getJewels();
 
-                }
+                Jewel chosenJewel = jewels.get(
+                        (int) Math.floor(random.nextDouble() * jewels.size())
+                );
+
+                int currentIndex = chosenJewel.jewelType.ordinal();
+                int randomOffset = (int) Math.ceil(random.nextDouble() * (jewelTypes.length - 1));
+                chosenJewel.jewelType = jewelTypes[(currentIndex + randomOffset) % jewelTypes.length];
+
             }
 
             matches = tripletBoard.getMatchedTriplets();
@@ -66,10 +71,10 @@ public class GameBoard extends UpdateSystem {
 
                 switch (mouseClick) {
                     case LEFT:
-                        addToActive(new SpinningTripletSequence(selectedTriplet, -1, this), new TryCascade());
+                        addToActive(new SpinningTripletSequence(selectedTriplet, -1, this), new ComboPop());
                         break;
                     case RIGHT:
-                        addToActive(new SpinningTripletSequence(selectedTriplet, 1, this), new TryCascade());
+                        addToActive(new SpinningTripletSequence(selectedTriplet, 1, this), new ComboPop());
                         break;
                 }
 
@@ -77,6 +82,10 @@ public class GameBoard extends UpdateSystem {
 
         }
 
+    }
+
+    private JewelType getRandomJewelType() {
+        return JewelType.values()[(int) Math.floor(random.nextDouble() * JewelType.length)];
     }
 
     private int[][] getBounds() {
@@ -200,25 +209,134 @@ public class GameBoard extends UpdateSystem {
 
     }
 
-    private class TryCascade implements IFinalizer {
-
-        //  check for combos
-        //  if there are combos
-        //      remove the jewels in the combos from the game board
-        //      slide existing jewels to the end of the fall lines
-        //      add new jewels to the top of the fall lines
-        //      start a combo animation sequence
-        //      start a falling jewel animation sequence
-        //      repeat
+    private class ComboPop implements IFinalizer {
 
         @Override
         public void finish() {
 
+            //jewelBoard.fallDirection = HexDirection.values()[(jewelBoard.fallDirection.ordinal() + 1) % HexDirection.length];
+            //jewelBoard.rebindFallLines();
+
             List<Combo> allCombos = getCombos();
 
             if (allCombos.size() > 0) {
+                addToActive(new ComboAnimationSequence(allCombos), new PostComboPop(allCombos));
+            } else {
+                ignoreInput = false;
+            }
 
-                addToActive(new ComboAnimationSequence(allCombos), new PostCascade());
+        }
+
+    }
+
+    private class PostComboPop implements IFinalizer {
+
+        private List<Combo> comboList;
+
+        public PostComboPop(List<Combo> comboList) {
+
+            this.comboList = comboList;
+
+        }
+
+        @Override
+        public void finish() {
+
+            if (comboList.size() > 0) {
+
+                List<Jewel> deadJewels =
+                        comboList
+                                .stream()
+                                .flatMap(
+                                        combo -> combo.connectedJewels.stream()
+                                )
+                                .collect(Collectors.toList());
+
+                deadJewels.forEach(jewelBoard::removeHex);
+
+                List<Jewel> fallingJewels = new ArrayList<>();
+
+                for (List<HexCoord> fallLine : jewelBoard.fallLines.values()) {
+
+                    List<Jewel> jewelsInLine =
+                            fallLine
+                                    .stream()
+                                    .map(jewelBoard::getHex)
+                                    .collect(Collectors.toList());
+
+                    for (Jewel jewel : jewelsInLine) {
+                        if (jewel != null) {
+                            jewelBoard.removeHex(jewel);
+                        }
+                    }
+
+                    for (int i = fallLine.size() - 1; i >= 0; i--) {
+
+                        Jewel current = jewelsInLine.get(i);
+
+                        if (current != null) {
+
+                            boolean moved = false;
+
+                            for (int currentI = i; currentI < fallLine.size() - 1; currentI++) {
+
+                                int nextI = currentI + 1;
+                                if (jewelsInLine.get(nextI) == null) {
+
+                                    current.coordinates = fallLine.get(nextI);
+
+                                    moved = true;
+
+                                    jewelsInLine.set(nextI, current);
+                                    jewelsInLine.set(currentI, null);
+
+                                } else break;
+
+                            }
+
+                            if (moved) {
+                                fallingJewels.add(current);
+                            }
+
+                        }
+
+                    }
+
+                    for (int i = 0; i < jewelsInLine.size(); i++) {
+
+                        Jewel jewel = jewelsInLine.get(i);
+
+                        if (jewel == null) {
+
+                            jewel = new Jewel(fallLine.get(i), jewelBoard, getRandomJewelType());
+
+                            fallingJewels.add(jewel);
+
+                            jewel.renderer.center.snapToTarget(
+                                    jewel.parent.renderer.coordinatesToPosition(
+                                            new HexCoord(
+                                                    jewel.coordinates.q + (-jewelBoard.fallDirection.q * fallLine.size()),
+                                                    jewel.coordinates.r + (-jewelBoard.fallDirection.r * fallLine.size())
+                                            )
+                                    )
+                            );
+
+                            for (int c = 0; c < jewel.parent.renderer.baseCorners.length; c++) {
+                                jewel.renderer.corners[c].snapToTarget(
+                                        jewel.parent.renderer.baseCorners[c].x + jewel.renderer.center.getX(),
+                                        jewel.parent.renderer.baseCorners[c].y + jewel.renderer.center.getY()
+                                );
+                            }
+
+                        }
+
+                        jewelBoard.addHex(jewel);
+
+                    }
+
+                }
+
+                addToActive(new FallingJewelSequence(fallingJewels), new ComboPop());
 
             } else {
 
@@ -226,15 +344,6 @@ public class GameBoard extends UpdateSystem {
 
             }
 
-        }
-
-    }
-
-    private class PostCascade implements IFinalizer {
-
-        @Override
-        public void finish() {
-            ignoreInput = false;
         }
 
     }

@@ -35,14 +35,6 @@ public class HexaMatch extends PApplet {
 
             fill(getColor(jewel.jewelType));
             drawHex(jewel);
-            /*
-            ellipse(
-                    (float)jewel.renderer.center.getX(),
-                    (float)jewel.renderer.center.getY(),
-                    (float)hexicGameBoard.jewelBoard.settings.hexRadius * 1.5f,
-                    (float)hexicGameBoard.jewelBoard.settings.hexRadius * 1.5f
-            );
-            */
 
             fill(50, 50);
             ellipse(
@@ -52,10 +44,12 @@ public class HexaMatch extends PApplet {
                     (float) hexicGameBoard.jewelBoard.settings.hexRadius / 2f
             );
 
+            /*
             fill(255);
             textAlign(CENTER, CENTER);
             textSize((float) hexicGameBoard.settings.jewelBoardSettings.hexRadius / 3f);
             text(jewel.coordinates.toString(), (float) jewel.renderer.center.getX(), (float) jewel.renderer.center.getY());
+            */
 
         }
 
@@ -98,7 +92,7 @@ public class HexaMatch extends PApplet {
             case O:
                 return color(250, 163, 129);
             default:
-                return color(255, 0, 255);
+                return color(255, 255, 255);
         }
     }
 
