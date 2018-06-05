@@ -6,12 +6,7 @@ import processing.core.PApplet;
 
 public class HexaMatch extends PApplet {
 
-    private static final GameBoard hexicGameBoard =
-            new GameBoard(
-                    new GameBoard.Settings(
-                            HexDirection.Dir5, HexType.FLAT, 50f, 0.9f, 4
-                    )
-            );
+    private static GameBoard hexicGameBoard;
 
     public static void main(String[] args) {
         PApplet.main("HexaMatch", args);
@@ -19,9 +14,19 @@ public class HexaMatch extends PApplet {
 
     @Override
     public void settings() {
-        size(1400, 900);
+        size(1280, 760);
     }
-
+    
+    @Override
+    public void setup() {        
+        int smallerDimension = min(width, height);
+        int boardSize = 4;
+        float hexRadius = smallerDimension / (boardSize * 4.5f);
+        
+        GameBoard.Settings settings = new GameBoard.Settings(HexDirection.Dir5, HexType.FLAT, hexRadius, 0.9f, boardSize);
+        hexicGameBoard = new GameBoard(settings);
+    }
+    
     @Override
     public void draw() {
 
