@@ -4,10 +4,18 @@ import processing.core.PApplet;
 import redsilencer.hexamatch.jewel.Jewel;
 
 public class JewelRenderer implements IShowable<Jewel> {
-	int[] colors = new int[]{0xFF0000, 0x00FF00, 0x0000FF, 0xFFFF00};
+	int[] colors = new int[]{0xFFFF0000, 0xFF00FF00, 0xFF0000FF, 0xFFFFFF00};
 	
-	public void show(PApplet sketch, Jewel jewel) {
-		//draw a hexagon
+	public void show(PApplet sketch, Jewel jewel, float x, float y, float scale) {
+		int jewelRenderColor = getColor(jewel);
+		
+		sketch.fill(jewelRenderColor);
+		sketch.stroke(sketch.lerpColor(0xFF000000, jewelRenderColor, 0.3f));
+		sketch.strokeWeight(.3f);
+		
+		sketch.translate(x, y);
+		HexRenderHelper.drawHex(sketch, scale);
+		sketch.translate(-x, -y);
 	}
 	
 	int getColor(Jewel jewel) {

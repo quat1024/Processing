@@ -16,7 +16,7 @@ public class Hex {
 		if(x + y + z != 0) throw new IllegalArgumentException(String.format("Invalid hex cube coordinates: %s %s %s", x, y, z));
 	}
 	
-	Hex offset(EnumHexDirection dir) {
+	public Hex offset(EnumHexDirection dir) {
 		return dir.offset(this);
 	}
 	

@@ -12,7 +12,7 @@ public class HexaMatch extends PApplet {
 	
 	@Override
 	public void settings() {
-		size(1280, 720);
+		size(1280, 720, P2D);
 	}
 	
 	//TODO Factor this out of the main area into something like "Game"
@@ -25,11 +25,20 @@ public class HexaMatch extends PApplet {
 	@Override
 	public void setup() {
 		board = new JewelBoard();
-		boardRenderer = new JewelBoardRenderer(new JewelRenderer());
+		boardRenderer = new JewelBoardRenderer();
+		
+		//blah
+		board.populate(4);
+		
+		smooth();
+		
+		frameRate(120);
 	}
 	
 	@Override
 	public void draw() {
-		boardRenderer.show(this, board);
+		background(0xFF16161D);
+		
+		boardRenderer.show(this, board, width / 2, height / 2, 40);
 	}
 }
