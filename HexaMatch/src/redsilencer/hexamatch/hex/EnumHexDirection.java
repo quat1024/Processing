@@ -19,4 +19,26 @@ public enum EnumHexDirection {
 	public Hex offset(Hex hex) {
 		return new Hex(hex.x + xOffset, hex.y + yOffset, hex.z + zOffset);
 	}
+	
+	public EnumHexDirection rotateClockwise() {
+		switch(this) {
+			case POSX: return NEGY;
+			case POSY: return NEGZ;
+			case POSZ: return NEGX;
+			case NEGX: return POSY;
+			case NEGY: return POSZ;
+			default:   return POSX; /*case NEGZ*/
+		}
+	}
+	
+	public EnumHexDirection rotateCounterclockwise() {
+		switch(this) {
+			case POSX: return NEGZ;
+			case POSY: return NEGX;
+			case POSZ: return NEGY;
+			case NEGX: return POSZ;
+			case NEGY: return POSX;
+			default:   return POSY; /*case NEGZ*/
+		}
+	}
 }

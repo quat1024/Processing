@@ -2,7 +2,6 @@ package redsilencer.hexamatch.jewel;
 
 import redsilencer.hexamatch.hex.EnumHexDirection;
 import redsilencer.hexamatch.hex.Hex;
-import redsilencer.hexamatch.util.MathUtil;
 
 import java.util.HashMap;
 
